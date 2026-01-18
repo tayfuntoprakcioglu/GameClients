@@ -1,0 +1,93 @@
+/* THEME DEFINITIONS */
+
+/* 1. ATLAS BLUE (DEFAULT) */
+body.theme-blue {
+    --bg-image: radial-gradient(circle at top left, #1e3a8a 0%, #0f172a 40%, #020617 100%);
+    --accent-color: #3b82f6;
+    --text-color: #e2e8f0;
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --card-border: rgba(255, 255, 255, 0.05);
+}
+
+/* 2. MIDNIGHT PURPLE */
+body.theme-purple {
+    --bg-image: radial-gradient(circle at top left, #581c87 0%, #2e1065 40%, #020617 100%);
+    --accent-color: #a855f7; /* Purple 500 */
+    --text-color: #f3e8ff;
+    --card-bg: rgba(59, 7, 100, 0.5);
+    --card-border: rgba(168, 85, 247, 0.2);
+}
+
+/* 3. EMERALD FOREST */
+body.theme-green {
+    --bg-image: radial-gradient(circle at top left, #064e3b 0%, #022c22 40%, #020617 100%);
+    --accent-color: #10b981; /* Emerald 500 */
+    --text-color: #ecfdf5;
+    --card-bg: rgba(6, 78, 59, 0.5);
+    --card-border: rgba(16, 185, 129, 0.2);
+}
+
+/* 4. STEALTH RED */
+body.theme-red {
+    --bg-image: radial-gradient(circle at top left, #7f1d1d 0%, #450a0a 40%, #000000 100%);
+    --accent-color: #ef4444; /* Red 500 */
+    --text-color: #fee2e2;
+    --card-bg: rgba(69, 10, 10, 0.5);
+    --card-border: rgba(239, 68, 68, 0.2);
+}
+
+/* 5. CYBERPUNK GOLD */
+body.theme-gold {
+    --bg-image: radial-gradient(circle at top left, #713f12 0%, #422006 40%, #000000 100%);
+    --accent-color: #eab308; /* Yellow 500 */
+    --text-color: #fefce8;
+    --card-bg: rgba(66, 32, 6, 0.5);
+    --card-border: rgba(234, 179, 8, 0.2);
+}
+
+/* APPLY VARIABLES */
+body {
+    background-image: var(--bg-image) !important;
+    color: var(--text-color) !important;
+}
+
+.brand h1 span, #user-name {
+    color: var(--accent-color) !important;
+}
+
+.tv-card {
+    background: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Button & Select Styling Updates for Themes */
+.custom-select {
+    border-color: var(--card-border) !important;
+    color: var(--text-color) !important;
+}
+.custom-select:focus {
+    border-color: var(--accent-color) !important;
+}
+
+/* Footer position adjustment if needed */
+.footer-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    z-index: 100;
+}
+
+.footer-credit {
+    position: static !important; /* Reset absolute since it's inside flex container now */
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.footer-selectors {
+    display: flex;
+    gap: 10px;
+}

@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Clients</title>
+    <link rel="stylesheet" href="demogui.css">
+
+    <style>
+        :root {
+            /* Fallback variables */
+            --bg-image: radial-gradient(circle at top left, #1e3a8a 0%, #0f172a 40%, #020617 100%);
+            --accent-color: #3b82f6;
+            --text-color: #e2e8f0;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* HEADER */
+        header {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding: 3rem 3rem 0 5rem;
+            z-index: 10;
+        }
+
+        .brand h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.05em;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand h1 span {
+            color: var(--accent-color);
+        }
+
+        .subtitle-link {
+            display: block;
+            margin-top: 5px;
+            color: #9ca3af;
+            font-weight: bold;
+            font-size: 1.125rem;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        .subtitle-link:hover {
+            color: #fff;
+        }
+
+        .greeting-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding-top: 1rem;
+        }
+
+        #greeting-text {
+            font-size: 2rem;
+            font-weight: 300;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        #user-name {
+            font-weight: 700;
+            color: var(--accent-color);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        #user-name:hover {
+            border-bottom-color: var(--accent-color);
+        }
+
+        .right-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .clock-container {
+            text-align: right;
+        }
+
+        #clock {
+            font-size: 3.75rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #date {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: rgba(191, 219, 254, 0.8);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            padding: 1rem 3rem 3rem 5rem;
+            scrollbar-width: none;
+        }
+
+        main::-webkit-scrollbar {
+            display: none;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin-bottom: 1.25rem;
+            padding-left: 0.25rem;
+            letter-spacing: 0.025em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tv-card {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-lg {
+            width: 14rem;
+            height: 9rem;
+        }
+
+        .card-md {
+            width: 8rem;
+            height: 8rem;
+        }
+
+        .card-sm {
+            width: 8rem;
+            height: 6rem;
+        }
+
+        .tv-card:hover,
+        .tv-card:focus {
+            transform: scale(1.1);
+            z-index: 50;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+            border-color: rgba(255, 255, 255, 0.5);
+            outline: none;
+            background-color: #0f172a;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+
+        /* For System/App Icons */
+        .card-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .card-bg-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            z-index: 1;
+        }
+
+        /* FOOTER */
+        .footer-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+            z-index: 100;
+        }
+
+        .footer-left,
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .version-info {
+            display: flex;
+            flex-direction: column;
+            margin-right: 10px;
+        }
+
+        .v-tag {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .v-date {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .footer-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .footer-credit {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-credit:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Footer & Custom Buttons */
+        .btn-footer-action,
+        .btn-custom,
+        select.custom-select {
+            background: rgba(0, 0, 0, 0.4);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+        }
+
+        .btn-footer-action:hover,
+        .btn-custom:hover,
+        select.custom-select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        option {
+            background: #0f172a;
+            color: white;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 400px;
+            max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .btn-save {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-remove {
+            background: #ef4444;
+            color: white;
+            margin-right: auto;
+        }
+
+        #bg-error-msg {
+            color: #f87171;
+            font-size: 0.85rem;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Custom Scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="theme-blue">
+    <!-- Overlay for grid -->
+    <div
+        style="position: fixed; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: -1;">
+    </div>
+
+    <!-- Modals -->
+    <div id="name-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="txt-modal-title">Edit Name</h3>
+            <input type="text" id="name-input" maxlength="20" placeholder="Gamer">
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="closeNameModal()" id="btn-cancel">Cancel</button>
+                <button class="btn btn-save" onclick="saveName()" id="btn-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bg-modal" class="modal-overlay" style="display: none; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="width: 900px; max-width: 95%; max-height: 90vh; padding: 2rem; display: flex; flex-direction: column; background: #1e293b;">
+
+            <h3 id="txt-bg-title" style="margin-bottom: 5px;">Themes</h3>
+            <p style="font-size:0.8rem; color:#9ca3af; margin-bottom: 20px;" id="txt-bg-desc">Select from presets or
+                upload your own.</p>
+
+            <!-- PRESETS (Moved Up) -->
+            <!-- BACKGROUND STYLES -->
+            <div style="margin-bottom: 25px;">
+                <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; font-weight: bold;">Background
+                    Styles</div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;" id="theme-options-container">
+                    <!-- Blue -->
+                    <div class="theme-option" onclick="selectTheme('theme-blue')" data-theme="theme-blue"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="theme-box"
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #3b82f6, #172554); border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Blue</span>
+                    </div>
+                    <!-- Purple -->
+                    <div class="theme-option" onclick="selectTheme('theme-purple')" data-theme="theme-purple"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="theme-box"
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #a855f7, #581c87); border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Purple</span>
+                    </div>
+                    <!-- Green -->
+                    <div class="theme-option" onclick="selectTheme('theme-green')" data-theme="theme-green"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="theme-box"
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #22c55e, #14532d); border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Green</span>
+                    </div>
+                    <!-- Red -->
+                    <div class="theme-option" onclick="selectTheme('theme-red')" data-theme="theme-red"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="theme-box"
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #7f1d1d); border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Red</span>
+                    </div>
+                    <!-- Gold -->
+                    <div class="theme-option" onclick="selectTheme('theme-gold')" data-theme="theme-gold"
+                        style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="theme-box"
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #eab308, #713f12); border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s;">
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Gold</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex: 1; overflow-y: auto; margin-bottom: 20px;">
+                <div style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 10px; font-weight: bold;">Background
+                    Images</div>
+                <div id="presets-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 2px;">
+                    <!-- JS Loaded -->
+                </div>
+            </div>
+
+            <!-- Hidden Upload Input -->
+            <input type="file" id="bg-upload" accept=".jpg,.jpeg,.png,.webp" style="display:none;"
+                onchange="handleBgUpload(this)">
+
+            <div id="bg-error-msg" style="margin-top: 10px; display:none; color: #ef4444; font-size: 0.8rem;"></div>
+            <div class="modal-buttons"
+                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="btn btn-remove" onclick="removeBg()" id="btn-bg-remove">Remove Theme</button>
+                <div style="flex:1"></div>
+                <button class="btn btn-cancel" onclick="closeBgModal()" id="btn-bg-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="launch-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="align-items: center; text-align: center; width: 350px;">
+            <div id="launch-icon-container" style="margin-bottom: 1rem;"></div>
+            <h3 id="txt-launch-title" style="margin-bottom: 0.5rem; color: var(--accent-color);">Launching...</h3>
+            <p id="txt-launch-desc" style="color: #cbd5e1; margin-bottom: 1rem;">Please wait...</p>
+            <div class="spinner"
+                style="width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite;">
+            </div>
+        </div>
+    </div>
+
+    <!-- IFRAME MODAL -->
+    <div id="iframe-modal" class="modal-overlay"
+        style="display: none; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="modal-content"
+            style="width: 90%; height: 90%; padding: 0; display: flex; flex-direction: column; background: #0f172a;">
+            <div
+                style="padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+                <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                    <h3 id="iframe-title"
+                        style="margin: 0; font-size: 1rem; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Web</h3>
+                    <a id="iframe-fallback-link" href="#" target="_blank"
+                        style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none; border: 1px solid var(--accent-color); padding: 2px 8px; border-radius: 4px; white-space: nowrap;">Open
+                        in Browser</a>
+                </div>
+                <button onclick="closeIframeModal()"
+                    style="background: none; border: none; color: #94a3b8; font-size: 2rem; line-height: 1; cursor: pointer;"
+                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+            </div>
+            <div style="flex: 1; position: relative;">
+                <iframe id="content-iframe" src="" style="width: 100%; height: 100%; border: none;"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREDITS MODAL -->
+    <div id="credits-modal" class="modal-overlay" style="display: none; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="width: 1000px; max-width: 95%; max-height: 95vh; overflow-y: auto; padding: 2rem; position: relative;">
+
+            <!-- Header -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                <h3 id="txt-hk-title" style="color: var(--accent-color); font-size: 1.5rem; margin: 0;">About</h3>
+                <button onclick="closeCreditsModal()"
+                    style="background: none; border: none; color: #94a3b8; font-size: 2rem; line-height: 1; cursor: pointer; padding: 0 0.5rem; transition: color 0.2s;"
+                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+            </div>
+
+            <div style="font-size: 0.9rem; color: #e2e8f0; line-height: 1.5;">
+                <p id="txt-hk-desc" style="margin-bottom: 1rem;">
+                    Game Clients application is an open-source project developed by <a
+                        href="https://tayfuntoprakcioglu.com/" target="_blank"
+                        style="color: #fff; text-decoration: underline;">tayfuntoprakcioglu.com</a>. It is made to
+                    support <strong>Ameliorated.io</strong> and <strong>AtlasOS</strong> communities.
+                </p>
+
+                <h4 id="txt-hk-imp"
+                    style="color: #fff; font-size: 1rem; margin: 1rem 0 0.5rem; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Important Info
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
+                        <strong id="txt-hk-stat-t" style="color: #60a5fa; display:block; margin-bottom:2px;">Official
+                            Status</strong>
+                        <span id="txt-hk-stat-d" style="font-size: 0.85rem; color: #cbd5e1;">Independent community
+                            initiative. Not affiliated with Microsoft or AtlasOS.</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
+                        <strong id="txt-hk-priv-t" style="color: #60a5fa; display:block; margin-bottom:2px;">Data
+                            Privacy</strong>
+                        <span id="txt-hk-priv-d" style="font-size: 0.85rem; color: #cbd5e1;">Data stored locally. No
+                            external transmission.</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.8rem;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
+                        <strong id="txt-hk-sec-t" style="color: #60a5fa; display:block; margin-bottom:2px;">Security &
+                            Version</strong>
+                        <a href="https://gameclients.tayfuntoprakcioglu.com/version.html" target="_blank"
+                            style="color: #cbd5e1; text-decoration: underline; font-size: 0.85rem;">gameclients.tayfuntoprakcioglu.com/version.html</a>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
+                        <strong id="txt-hk-open-t" style="color: #60a5fa; display:block; margin-bottom:2px;">Open
+                            Source</strong>
+                        <a href="https://github.com/tayfuntoprakcioglu/gameclients" target="_blank"
+                            style="color: #cbd5e1; text-decoration: underline; font-size: 0.85rem;">github.com/tayfuntoprakcioglu/gameclients</a>
+                    </div>
+                </div>
+
+                <h4 id="txt-hk-links-t"
+                    style="color: #fff; font-size: 1rem; margin: 1.5rem 0 0.8rem; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    Important Links
+                </h4>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                    <!-- Ameliorated IO -->
+                    <div>
+                        <strong
+                            style="display: block; color: var(--accent-color); margin-bottom: 0.4rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px;">Ameliorated.io</strong>
+                        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem;">
+                            <a href="https://t.me/+TFCUAzfq6Y-Bl9vG" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Telegram</a>
+                            <a href="https://discord.gg/kAnuJUPvGX" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Discord</a>
+                            <a href="https://x.com/ameliorated117" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">X (Twitter)</a>
+                            <a href="https://docs.amelabs.net/index.html" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Docs</a>
+                        </div>
+                    </div>
+
+                    <!-- Atlas OS -->
+                    <div>
+                        <strong
+                            style="display: block; color: var(--accent-color); margin-bottom: 0.4rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px;">Atlas
+                            OS</strong>
+                        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem;">
+                            <a href="https://github.com/Atlas-OS/Atlas" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">GitHub</a>
+                            <a href="https://discord.com/invite/atlasos" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Discord</a>
+                            <a href="https://x.com/atlasos" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">X (Twitter)</a>
+                        </div>
+                    </div>
+
+                    <!-- Tayfun Toprakcioglu -->
+                    <div>
+                        <strong id="txt-hk-dev"
+                            style="display: block; color: var(--accent-color); margin-bottom: 0.4rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px;">Developer</strong>
+                        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem;">
+                            <a href="https://tayfuntoprakcioglu.com/" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Website</a>
+                            <a href="https://www.linkedin.com/in/tayfuntoprakcioglu/" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">LinkedIn</a>
+                            <a href="https://www.instagram.com/tayfuntoprakcioglu" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Instagram</a>
+                            <a href="https://github.com/tayfuntoprakcioglu" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">GitHub</a>
+                        </div>
+                    </div>
+
+                    <!-- Game Clients -->
+                    <div>
+                        <strong id="txt-hk-proj"
+                            style="display: block; color: var(--accent-color); margin-bottom: 0.4rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px;">Project</strong>
+                        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem;">
+                            <a href="https://gameclients.tayfuntoprakcioglu.com/" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Official Page</a>
+                            <a href="https://github.com/tayfuntoprakcioglu/gameclients" target="_blank"
+                                style="color: #94a3b8; text-decoration: none;" onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Repo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Button Removed since we have top X -->
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <h1>GAME <span>CLIENTS</span> <span
+                    style="font-size: 0.4em; color: var(--accent-color); vertical-align: top; margin-left: 2px; font-weight: 300; opacity: 0.8;">BETA</span>
+            </h1>
+            <a href="https://atlasos.net/" target="_blank" class="subtitle-link" id="txt-for">for Atlas OS</a>
+        </div>
+        <div class="greeting-container">
+            <div id="greeting-text">
+                <span id="txt-greet">Welcome</span>,
+                <span id="user-name" onclick="openNameModal()">Gamer</span>
+            </div>
+        </div>
+        <div class="right-controls">
+            <div class="clock-container">
+                <div id="clock">--:--</div>
+                <div id="date">Loading...</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- FAVORITES -->
+        <section id="sec-favorites" style="display:none;">
+            <div class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#facc15">
+                    <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                <span id="txt-favorites">Favorites</span>
+            </div>
+            <div id="favorites-container" class="card-row"></div>
+        </section>
+
+        <!-- ALL CLIENTS -->
+        <section id="sec-all">
+            <div class="section-title" id="txt-all">All Clients</div>
+            <div id="all-clients-container" class="card-row"></div>
+        </section>
+
+        <!-- SYSTEM -->
+        <section>
+            <div class="section-title" id="txt-system">System</div>
+            <div class="card-row">
+                <!-- Atlas Toolbox -->
+                <a href="#"
+                    onclick="launchClient({name:'Atlas Toolbox', url:'gameclients:toolbox', img:'img/atlas.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/atlas.png" class="card-icon" alt="Atlas">
+                    <span class="card-label">Atlas Toolbox</span>
+                </a>
+                <!-- Restart -->
+                <a href="#"
+                    onclick="launchClient({name:'Restart', url:'gameclients:restart', img:'img/restart.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/restart.png" class="card-icon" alt="Restart">
+                    <span id="txt-restart" class="card-label">Restart</span>
+                </a>
+                <!-- Shutdown -->
+                <a href="#"
+                    onclick="launchClient({name:'Shutdown', url:'gameclients:shutdown', img:'img/shutdown.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/shutdown.png" class="card-icon" alt="Shutdown">
+                    <span id="txt-shutdown" class="card-label">Shutdown</span>
+                </a>
+                <!-- Downloads -->
+                <a href="#"
+                    onclick="launchClient({name:'Downloads', url:'gameclients:downloads', img:'img/downloads.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/downloads.png" class="card-icon" alt="Downloads">
+                    <span id="txt-downloads" class="card-label">Downloads</span>
+                </a>
+                <!-- Apps -->
+                <a href="#"
+                    onclick="launchClient({name:'Add/Remove Programs', url:'gameclients:appsize', img:'img/uninstall.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/uninstall.png" class="card-icon" alt="Apps">
+                    <span id="txt-prog" class="card-label">Apps</span>
+                </a>
+                <!-- Bluetooth -->
+                <a href="#"
+                    onclick="launchClient({name:'Bluetooth', url:'gameclients:bluetooth', img:'img/bluetooth.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/bluetooth.png" class="card-icon" alt="Bluetooth"
+                        onerror="this.src='https://img.icons8.com/ios-filled/50/ffffff/bluetooth.png'">
+                    <span id="txt-bt" class="card-label">Bluetooth</span>
+                </a>
+                <!-- Wifi -->
+                <a href="#"
+                    onclick="launchClient({name:'Wifi', url:'gameclients:wifi', img:'img/wifi.png'}); return false;"
+                    class="tv-card card-sm">
+                    <img src="img/wifi.png" class="card-icon" alt="Wifi"
+                        onerror="this.src='https://img.icons8.com/ios-filled/50/ffffff/wifi.png'">
+                    <span id="txt-wifi" class="card-label">Wifi</span>
+                </a>
+                <!-- Game Booster -->
+                <a href="#"
+                    onclick="launchClient({name:'Game Booster', url:'gameclients:optimize', img:'img/rocket.png'}); return false;"
+                    class="tv-card card-sm" style="border-color: #f59e0b;">
+                    <img src="img/rocket.png" class="card-icon" alt="Boost"
+                        onerror="this.src='https://img.icons8.com/ios-filled/50/f59e0b/rocket.png'">
+                    <span id="txt-boost" class="card-label" style="color:#fcd34d">Game Mode</span>
+                </a>
+                <!-- Desktop Mode -->
+                <a href="#"
+                    onclick="launchClient({name:'Desktop Mode', url:'gameclients:restore', img:'img/desktop.png'}); return false;"
+                    class="tv-card card-sm" style="border-color: #3b82f6;">
+                    <img src="img/desktop.png" class="card-icon" alt="Desktop"
+                        onerror="this.src='https://img.icons8.com/ios-filled/50/3b82f6/monitor.png'">
+                    <span id="txt-desktop" class="card-label" style="color:#93c5fd">Desktop</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer-bar">
+        <div class="footer-left">
+            <div class="version-info">
+                <div class="v-tag">v2.6</div>
+                <div class="v-date">14.01.2026</div>
+            </div>
+            <button class="btn-footer-action" onclick="openCreditsModal()"
+                style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                <span id="txt-footer-about-btn">About</span>
+            </button>
+            <button class="btn-footer-action" onclick="launchClient({name:'Previous Menu', url:'gameclients:return'});"
+                style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                <span id="txt-return">Return</span>
+            </button>
+            <button class="btn-footer-action" onclick="launchClient({name:'Uninstaller', url:'gameclients:uninstall'});"
+                style="border-color: rgba(244, 63, 94, 0.4); color: #fda4af;">
+                <span id="txt-uninstall">Uninstall</span>
+            </button>
+        </div>
+        <div class="footer-center">
+            <a href="#" onclick="openCreditsModal(); return false;" class="footer-credit">Developed by
+                gameclients.tayfuntoprakcioglu.com</a>
+        </div>
+        <div class="footer-right">
+            <button class="btn-custom" onclick="openBgModal()" id="btn-custom">Themes</button>
+            <select id="lang-select" class="custom-select" onchange="changeLang(this.value)">
+                <option value="en">English</option>
+                <option value="tr">Türkçe</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="pt">Português</option>
+                <option value="ru">Русский</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+    </footer>
+
+    <script>
+        const themeOverlays = {
+            'theme-blue': 'rgba(15, 23, 42, 0.85)',
+            'theme-purple': 'rgba(46, 16, 101, 0.85)',
+            'theme-green': 'rgba(2, 44, 34, 0.85)',
+            'theme-red': 'rgba(69, 10, 10, 0.85)',
+            'theme-gold': 'rgba(66, 32, 6, 0.85)'
+        };
+
+        const translations = {
+            en: {
+                fav: "Favorites", all: "All Clients", sys: "System", for: "for Atlas OS",
+                g_m: "Good Morning", g_a: "Good Afternoon", g_e: "Good Evening",
+                ret: "Return", uni: "Uninstall", dl: "Download",
+                rest: "Restart", shut: "Shutdown", down: "Downloads", prog: "Programs",
+                mod_title: "Edit Name", btn_save: "Save", btn_cancel: "Cancel",
+                btn_custom: "Themes", bg_title: "Themes", bg_desc: "Select from presets or upload your own.", bg_remove: "Remove Theme", bg_err: "Invalid URL",
+                launch_wait: "Please wait while we start the content.", launch_approve: "Waiting for browser confirmation...",
+                hk_title: "About",
+                hk_desc: "Game Clients application is an open-source project developed by <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a>. It is made to support <strong>Ameliorated.io</strong> and <strong>AtlasOS</strong> communities.",
+                hk_imp: "Important Info",
+                hk_stat_t: "Official Status", hk_stat_d: "Independent community initiative. Not directly affiliated with Microsoft, Ameliorated.io, or AtlasOS team.",
+                hk_priv_t: "Data Privacy", hk_priv_d: "Data stored locally. No external transmission or sharing.",
+                hk_sec_t: "Security & Version", hk_open_t: "Open Source", hk_links_t: "Important Links", hk_dev: "Developer", hk_proj: "Project"
+            },
+            tr: {
+                fav: "Favoriler", all: "Tüm İstemciler", sys: "Sistem", for: "Atlas OS için",
+                g_m: "Günaydın", g_a: "İyi Günler", g_e: "İyi Akşamlar",
+                ret: "Geri Dön", uni: "Kaldır", dl: "İndir",
+                rest: "Yeniden Başlat", shut: "Kapat", down: "İndirilenler", prog: "Programlar",
+                mod_title: "İsmi Düzenle", btn_save: "Kaydet", btn_cancel: "İptal",
+                btn_custom: "Temalar", bg_title: "Temalar", bg_desc: "Hazır ayarlardan seçin veya yükleyin.", bg_remove: "Temayı Kaldır", bg_err: "Geçersiz URL",
+                launch_wait: "İçerik başlatılırken lütfen bekleyin.", launch_approve: "Tarayıcı onayı bekleniyor...",
+                hk_title: "Hakkında",
+                hk_desc: "Game Clients uygulaması, <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> tarafından geliştirilmiş, açık kaynak kodlu bir Game Clients projesidir. Game Clients, Windows işletim sistemi üzerinde performans odaklı bir deneyim sunan <strong>Ameliorated.io</strong> ve <strong>AtlasOS</strong> topluluklarını desteklemek amacıyla yapılmıştır.",
+                hk_imp: "Önemli Bilgiler",
+                hk_stat_t: "Resmi Durum", hk_stat_d: "Tamamen bağımsız bir topluluk girişimidir. Microsoft, Ameliorated.io veya AtlasOS ile doğrudan bağlantılı değildir.",
+                hk_priv_t: "Veri Gizliliği", hk_priv_d: "Verileriniz yalnızca yerel cihazınızda depolanır. Hiçbir veriniz dış sunuculara aktarılmaz.",
+                hk_sec_t: "Güvenlik ve Sürüm", hk_open_t: "Açık Kaynak", hk_links_t: "Önemli Bağlantılar", hk_dev: "Geliştirici", hk_proj: "Proje"
+            },
+            de: {
+                fav: "Favoriten", all: "Alle Clients", sys: "System", for: "für Atlas OS",
+                g_m: "Guten Morgen", g_a: "Guten Tag", g_e: "Guten Abend",
+                ret: "Zurück", uni: "Deinstallieren", dl: "Herunterladen",
+                rest: "Neustart", shut: "Herunterfahren", down: "Downloads", prog: "Programme",
+                mod_title: "Name bearbeiten", btn_save: "Speichern", btn_cancel: "Abbrechen",
+                btn_custom: "Themen", bg_title: "Themen", bg_desc: "Aus Voreinstellungen wählen oder hochladen.", bg_remove: "Thema Entfernen", bg_err: "Ungültiges Format",
+                launch_wait: "Bitte warten, Inhalt wird gestartet.", launch_approve: "Warte auf Bestätigung...",
+                hk_title: "Über",
+                hk_desc: "Die Game Clients-Anwendung ist ein Open-Source-Projekt von <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a>. Sie unterstützt die <strong>Ameliorated.io</strong> und <strong>AtlasOS</strong>-Communities.",
+                hk_imp: "Wichtige Infos",
+                hk_stat_t: "Offizieller Status", hk_stat_d: "Unabhängige Community-Initiative. Nicht mit Microsoft oder AtlasOS verbunden.",
+                hk_priv_t: "Datenschutz", hk_priv_d: "Daten nur lokal gespeichert. Keine externe Übertragung.",
+                hk_sec_t: "Sicherheit & Version", hk_open_t: "Open Source", hk_links_t: "Wichtige Links", hk_dev: "Entwickler", hk_proj: "Projekt"
+            },
+            fr: {
+                fav: "Favoris", all: "Tous les Clients", sys: "Système", for: "pour Atlas OS",
+                g_m: "Bonjour", g_a: "Bon après-midi", g_e: "Bonsoir",
+                ret: "Retour", uni: "Désinstaller", dl: "Télécharger",
+                rest: "Redémarrer", shut: "Éteindre", down: "Téléch.", prog: "Programmes",
+                mod_title: "Modifier le nom", btn_save: "Enregistrer", btn_cancel: "Annuler",
+                btn_custom: "Personnalisé", bg_title: "Arrière-plan", bg_desc: "URL de l'image", bg_remove: "Supprimer", bg_err: "Format invalide",
+                launch_wait: "Veuillez patienter...", launch_approve: "En attente de confirmation...",
+                hk_title: "À propos",
+                hk_desc: "Game Clients est un projet open-source développé par <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> pour soutenir les communautés <strong>Ameliorated.io</strong> et <strong>AtlasOS</strong>.",
+                hk_imp: "Infos Importantes",
+                hk_stat_t: "Statut Officiel", hk_stat_d: "Initiative communautaire indépendante. Non affilié à Microsoft ou AtlasOS.",
+                hk_priv_t: "Confidentialité", hk_priv_d: "Données stockées localement. Aucune transmission externe.",
+                hk_sec_t: "Sécurité & Version", hk_open_t: "Open Source", hk_links_t: "Liens Importants", hk_dev: "Développeur", hk_proj: "Projet"
+            },
+            it: {
+                fav: "Preferiti", all: "Tutti i Client", sys: "Sistema", for: "per Atlas OS",
+                g_m: "Buongiorno", g_a: "Buon pomeriggio", g_e: "Buonasera",
+                ret: "Ritorno", uni: "Disinstalla", dl: "Scarica",
+                rest: "Riavvia", shut: "Spegni", down: "Download", prog: "Programmi",
+                mod_title: "Modifica Nome", btn_save: "Salva", btn_cancel: "Annulla",
+                btn_custom: "Temi", bg_title: "Temi", bg_desc: "Seleziona preset o carica.", bg_remove: "Rimuovi Tema", bg_err: "Formato non valido",
+                launch_wait: "Attendere prego...", launch_approve: "In attesa di conferma...",
+                hk_title: "Info",
+                hk_desc: "Applicazione Game Clients è un progetto open-source di <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> a supporto delle comunità <strong>Ameliorated.io</strong> e <strong>AtlasOS</strong>.",
+                hk_imp: "Info Importanti",
+                hk_stat_t: "Stato Ufficiale", hk_stat_d: "Iniziativa indipendente. Non affiliato con Microsoft o AtlasOS.",
+                hk_priv_t: "Privacy Dati", hk_priv_d: "Dati salvati localmente. Nessuna trasmissione esterna.",
+                hk_sec_t: "Sicurezza & Versione", hk_open_t: "Open Source", hk_links_t: "Link Importanti", hk_dev: "Sviluppatore", hk_proj: "Progetto"
+            },
+            pt: {
+                fav: "Favoritos", all: "Todos os Clientes", sys: "Sistema", for: "para Atlas OS",
+                g_m: "Bom dia", g_a: "Boa tarde", g_e: "Boa noite",
+                ret: "Voltar", uni: "Desinstalar", dl: "Baixar",
+                rest: "Reiniciar", shut: "Desligar", down: "Downloads", prog: "Programas",
+                mod_title: "Editar Nome", btn_save: "Salvar", btn_cancel: "Cancelar",
+                btn_custom: "Temas", bg_title: "Temas", bg_desc: "Selecione preset ou carregue.", bg_remove: "Remover Tema", bg_err: "Formato inválido",
+                launch_wait: "Por favor aguarde...", launch_approve: "Aguardando confirmação...",
+                hk_title: "Sobre",
+                hk_desc: "Game Clients é um projeto de código aberto desenvolvido por <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> para apoiar as comunidades <strong>Ameliorated.io</strong> e <strong>AtlasOS</strong>.",
+                hk_imp: "Informações Importantes",
+                hk_stat_t: "Status Oficial", hk_stat_d: "Iniciativa comunitária independente. Não afiliado à Microsoft ou AtlasOS.",
+                hk_priv_t: "Privacidade", hk_priv_d: "Dados armazenados localmente. Nenhuma transmissão externa.",
+                hk_sec_t: "Segurança & Versão", hk_open_t: "Código Aberto", hk_links_t: "Links Importantes", hk_dev: "Desenvolvedor", hk_proj: "Projeto"
+            },
+            ru: {
+                fav: "Избранное", all: "Все Клиенты", sys: "Система", for: "для Atlas OS",
+                g_m: "Доброе утро", g_a: "Добрый день", g_e: "Добрый вечер",
+                ret: "Вернуться", uni: "Удалить", dl: "Скачать",
+                rest: "Перезагрузка", shut: "Выключение", down: "Загрузки", prog: "Программы",
+                mod_title: "Изменить имя", btn_save: "Сохранить", btn_cancel: "Отмена",
+                btn_custom: "Темы", bg_title: "Темы", bg_desc: "Выберите пресет или загрузите.", bg_remove: "Удалить тему", bg_err: "Неверный формат",
+                launch_wait: "Пожалуйста, подождите...", launch_approve: "Ожидание подтверждения...",
+                hk_title: "О программе",
+                hk_desc: "Game Clients - это проект с открытым кодом от <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> для поддержки сообществ <strong>Ameliorated.io</strong> и <strong>AtlasOS</strong>.",
+                hk_imp: "Важная информация",
+                hk_stat_t: "Официальный статус", hk_stat_d: "Независимая инициатива. Не связано с Microsoft или AtlasOS.",
+                hk_priv_t: "Конфиденциальность", hk_priv_d: "Данные хранятся локально. Нет внешней передачи.",
+                hk_sec_t: "Безопасность и Версия", hk_open_t: "Открытый код", hk_links_t: "Важные ссылки", hk_dev: "Разработчик", hk_proj: "Проект"
+            },
+            zh: {
+                fav: "收藏夹", all: "所有客户端", sys: "系统", for: "适用于 Atlas OS",
+                g_m: "早上好", g_a: "下午好", g_e: "晚上好",
+                ret: "返回", uni: "卸载", dl: "下载",
+                rest: "重启", shut: "关机", down: "下载", prog: "程序",
+                mod_title: "编辑名称", btn_save: "保存", btn_cancel: "取消",
+                btn_custom: "主题", bg_title: "主题", bg_desc: "选择预设或上传。", bg_remove: "删除主题", bg_err: "格式无效",
+                launch_wait: "请稍候...", launch_approve: "等待确认...",
+                hk_title: "关于",
+                hk_desc: "Game Clients 是由 <a href='#' onclick=\"openIframeModal('https://tayfuntoprakcioglu.com/', 'Tayfun Toprakcioglu'); return false;\" style='color:#fff;text-decoration:underline;'>tayfuntoprakcioglu.com</a> 开发的开源项目，旨在支持 <strong>Ameliorated.io</strong> 和 <strong>AtlasOS</strong> 社区。",
+                hk_imp: "重要信息",
+                hk_stat_t: "官方状态", hk_stat_d: "独立的社区倡议。与 Microsoft 或 AtlasOS 无直接关联。",
+                hk_priv_t: "数据隐私", hk_priv_d: "数据仅存储在本地。无外部传输。",
+                hk_sec_t: "安全与版本", hk_open_t: "开源", hk_links_t: "重要链接", hk_dev: "开发者", hk_proj: "项目"
+            }
+        };
+
+        let currentLang = localStorage.getItem('gc_lang') || 'en';
+        let currentTheme = localStorage.getItem('gc_theme') || 'theme-blue';
+
+        // --- NAME LOGIC ---
+        let defaultName = 'Gamer';
+        // Attempt to get system info from gameclientsinstalled.js (window.SYS_USER)
+        if (typeof window.SYS_USER !== 'undefined' && window.SYS_USER) defaultName = window.SYS_USER;
+        else if (typeof window.SYS_PC !== 'undefined' && window.SYS_PC) defaultName = window.SYS_PC;
+
+        let userName = localStorage.getItem('gc_username') || defaultName;
+        // Auto-save default name on first run
+        if (!localStorage.getItem('gc_username') && defaultName !== 'Gamer') {
+            localStorage.setItem('gc_username', defaultName);
+        }
+
+        let customBgUrl = localStorage.getItem('gc_bg') || '';
+
+        // --- CLIENT DATA with Correct Icons ---
+        const placeholderClients = [
+            { name: "Epic Games", id: "epic", url: "gameclients:epic", dl: "https://store.epicgames.com/download", color: "#ffffff", img: "img/epic.png" },
+            { name: "Steam", id: "steam", url: "gameclients:steam", dl: "https://store.steampowered.com/about/", color: "#60a5fa", img: "img/steam.png" },
+            { name: "Xbox", id: "xbox", url: "gameclients:xbox", dl: "https://www.xbox.com", color: "#107C10", img: "img/xbox.png" },
+            { name: "Battle.net", id: "bnet", url: "gameclients:bnet", dl: "https://download.battle.net", color: "#148EFF", img: "img/battlenet.png" },
+            { name: "Ubisoft Connect", id: "ubi", url: "gameclients:ubi", dl: "https://www.ubisoft.com/ubisoft-connect/download", color: "#d1d5db", img: "img/ubisoft.png" },
+            { name: "EA", id: "ea", url: "gameclients:ea", dl: "https://www.ea.com/ea-app", color: "#ff5722", img: "img/origin.png" },
+            { name: "RIOT", id: "riot", url: "gameclients:riot", dl: "https://www.riotgames.com", color: "#ef4444", img: "img/riot.png" },
+            { name: "Rockstar Games Social Club", id: "rock", url: "gameclients:rock", dl: "https://www.rockstargames.com", color: "#eab308", img: "img/socialclub.png" }
+        ];
+
+        window.addEventListener('load', () => {
+            attemptFullscreen();
+            window.addEventListener('focus', attemptFullscreen);
+            window.addEventListener('click', attemptFullscreen);
+
+            if (typeof window.INSTALLED_APPS === 'undefined') {
+                window.INSTALLED_APPS = []; // Prevent Errors
+            }
+
+            // Set UI elements
+            document.getElementById('lang-select').value = currentLang;
+            document.getElementById('user-name').innerText = userName;
+
+            setLang(currentLang);
+            changeTheme(currentTheme);
+            fetchClients();
+        });
+
+        async function fetchClients() {
+            try {
+                // Try to fetch external JSON if available, else use placeholder
+                const response = await fetch('http://gameclients.tayfuntoprakcioglu.com/clients.json');
+                if (!response.ok) throw new Error("Fetch failed");
+                const data = await response.json();
+                processClients(data);
+            } catch (error) {
+                processClients(placeholderClients);
+            }
+        }
+
+        function processClients(list) {
+            const favContainer = document.getElementById('favorites-container');
+            const allContainer = document.getElementById('all-clients-container');
+            const favSection = document.getElementById('sec-favorites');
+
+            favContainer.innerHTML = '';
+            allContainer.innerHTML = '';
+            let hasFavorites = false;
+
+            list.forEach(item => {
+                const isInstalled = window.INSTALLED_APPS.includes(item.id);
+                // Create Card
+                const card = document.createElement('a');
+                card.className = `tv-card ${item.id}`;
+                card.tabIndex = 0;
+                if (item.color) card.style.color = item.color;
+
+                let contentHTML = '<div class="card-bg-gradient"></div>';
+                let imgPath = item.img;
+
+                // Render Icon or Text
+                if (imgPath) {
+                    contentHTML += `<img src="${imgPath}" class="card-icon" style="width: 64px; height: 64px;" alt="${item.name}">`;
+                    contentHTML += `<span class="card-label">${item.name}</span>`;
+                } else {
+                    contentHTML += `<span class="card-label" style="font-size: 1.5rem;">${item.name}</span>`;
+                }
+                card.innerHTML = contentHTML;
+
+                if (isInstalled) {
+                    card.classList.add('card-lg');
+                    card.href = '#';
+                    card.onclick = (e) => { e.preventDefault(); launchClient(item); };
+                    favContainer.appendChild(card);
+                    hasFavorites = true;
+                } else {
+                    card.classList.add('card-md');
+                    card.href = '#';
+                    card.onclick = (e) => { e.preventDefault(); openDownloadModal(item); };
+
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex'; wrapper.style.flexDirection = 'column'; wrapper.style.alignItems = 'center'; wrapper.style.gap = '0.5rem';
+                    wrapper.appendChild(card);
+
+                    const dlBtn = document.createElement('div');
+                    dlBtn.className = 'dl-link';
+                    dlBtn.innerText = translations[currentLang]?.dl || "Download";
+                    dlBtn.style.fontSize = '0.8rem'; dlBtn.style.color = 'rgba(255,255,255,0.5)';
+                    dlBtn.style.cursor = 'pointer'; dlBtn.style.textDecoration = 'underline';
+                    dlBtn.onclick = (e) => { e.preventDefault(); openDownloadModal(item); };
+
+                    wrapper.appendChild(dlBtn);
+                    allContainer.appendChild(wrapper);
+                }
+            });
+
+            favSection.style.display = hasFavorites ? 'block' : 'none';
+        }
+
+        // --- LAUNCH LOGIC (Cleaned Up) ---
+        let launchTimeout, blurListener, focusListener;
+
+        function launchClient(item) {
+            const modal = document.getElementById('launch-modal');
+            const title = document.getElementById('txt-launch-title');
+            const desc = document.getElementById('txt-launch-desc');
+            const iconContainer = document.getElementById('launch-icon-container');
+
+            modal.style.display = 'flex';
+
+            title.innerText = "Starting " + item.name + "...";
+            desc.innerText = translations[currentLang]?.launch_wait || "Please wait...";
+            desc.style.color = "#cbd5e1";
+
+            // Icon priority: passed img > item.img > fallback
+            let imgPath = item.img;
+
+            if (imgPath) iconContainer.innerHTML = `<img src="${imgPath}" style="width: 64px; height: 64px; object-fit: contain;">`;
+            else iconContainer.innerHTML = '';
+
+            // Clean up old listeners
+            if (blurListener) window.removeEventListener('blur', blurListener);
+            if (focusListener) window.removeEventListener('focus', focusListener);
+            clearTimeout(launchTimeout);
+
+            let hasBlurred = false;
+
+            // Smart Launch Listeners
+            blurListener = () => {
+                hasBlurred = true;
+                clearTimeout(launchTimeout);
+                desc.innerText = translations[currentLang]?.launch_approve || "Waiting for confirm...";
+                desc.style.color = "#facc15";
+            };
+
+            focusListener = () => {
+                if (hasBlurred) {
+                    setTimeout(() => { modal.style.display = 'none'; }, 500);
+                    window.removeEventListener('blur', blurListener);
+                    window.removeEventListener('focus', focusListener);
+                }
+            };
+
+            window.addEventListener('blur', blurListener);
+            window.addEventListener('focus', focusListener);
+
+            setTimeout(() => {
+                window.location.href = item.url;
+                // Auto close if no prompt (2.5s)
+                launchTimeout = setTimeout(() => {
+                    if (!hasBlurred) {
+                        modal.style.display = 'none';
+                        window.removeEventListener('blur', blurListener);
+                        window.removeEventListener('focus', focusListener);
+                    }
+                }, 2500);
+            }, 300);
+        }
+
+        function openDownload(url) {
+            if (!url) return;
+            const w = 800;
+            const h = 600;
+            const l = (screen.width - w) / 2;
+            const t = (screen.height - h) / 2;
+            const features = 'width=' + w + ',height=' + h + ',top=' + t + ',left=' + l + ',popup=yes,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no';
+            const popup = window.open(url, 'GameDLPopup', features);
+
+            // Immediate fullscreen attempt to keep GUI immersive if possible
+            attemptFullscreen();
+
+            // Monitor popup and force fullscreen when closed (backup)
+            const timer = setInterval(() => {
+                if (popup && popup.closed) {
+                    clearInterval(timer);
+                    attemptFullscreen();
+                }
+            }, 500);
+        }
+
+        // --- UTILS (Modal, Name, BG, Theme, Fullscreen) ---
+        function openNameModal() { document.getElementById('name-input').value = userName; document.getElementById('name-modal').style.display = 'flex'; document.getElementById('name-input').focus(); }
+        function closeNameModal() { document.getElementById('name-modal').style.display = 'none'; }
+        function saveName() { const val = document.getElementById('name-input').value.trim(); if (val) { userName = val; localStorage.setItem('gc_username', userName); document.getElementById('user-name').innerText = userName; updateTime(); } closeNameModal(); }
+        document.getElementById('name-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') closeNameModal(); });
+
+
+        function applyBackground() {
+            if (customBgUrl) {
+                const ov = themeOverlays[currentTheme] || 'rgba(15,23,42,0.85)';
+                document.body.style.setProperty('--bg-image', `linear-gradient(${ov}, ${ov}), url('${customBgUrl}')`);
+            } else { document.body.style.removeProperty('--bg-image'); }
+        }
+
+        function changeTheme(val) { currentTheme = val; document.body.className = val; localStorage.setItem('gc_theme', val); applyBackground(); }
+        function changeLang(val) { localStorage.setItem('gc_lang', val); setLang(val); }
+
+        function setLang(lang) {
+            currentLang = lang;
+            const t = translations[lang] || translations['en'];
+
+            document.getElementById('txt-favorites').innerText = t.fav;
+            document.getElementById('txt-all').innerText = t.all;
+            document.getElementById('txt-system').innerText = t.sys;
+            document.getElementById('txt-for').innerText = t.for;
+
+            // Footer & System Buttons
+            document.getElementById('txt-return').innerText = t.ret;
+            document.getElementById('txt-uninstall').innerText = t.uni;
+            document.getElementById('txt-restart').innerText = t.rest;
+            document.getElementById('txt-shutdown').innerText = t.shut;
+            document.getElementById('txt-downloads').innerText = t.down;
+            document.getElementById('txt-prog').innerText = t.prog;
+
+            document.getElementById('btn-custom').innerText = t.btn_custom;
+            document.querySelectorAll('.dl-link').forEach(el => el.innerText = t.dl);
+
+            // Modals
+            const footerAbout = document.getElementById('txt-footer-about-btn');
+            if (footerAbout) footerAbout.innerText = t.hk_title || "About";
+
+            document.getElementById('txt-modal-title').innerText = t.mod_title;
+            document.getElementById('btn-save').innerText = t.btn_save;
+            document.getElementById('btn-cancel').innerText = t.btn_cancel;
+            document.getElementById('txt-bg-title').innerText = t.bg_title; document.getElementById('txt-bg-desc').innerText = t.bg_desc;
+            document.getElementById('btn-bg-remove').innerText = t.bg_remove; document.getElementById('btn-bg-cancel').innerText = t.btn_cancel;
+
+            // Credits Modal Translations
+            document.getElementById('txt-hk-title').innerText = t.hk_title || "About";
+            document.getElementById('txt-hk-desc').innerHTML = t.hk_desc || ""; // innerHTML for links
+            document.getElementById('txt-hk-imp').innerText = t.hk_imp || "Important Info";
+            document.getElementById('txt-hk-stat-t').innerText = t.hk_stat_t || "Official Status";
+            document.getElementById('txt-hk-stat-d').innerText = t.hk_stat_d || "";
+            document.getElementById('txt-hk-priv-t').innerText = t.hk_priv_t || "Data Privacy";
+            document.getElementById('txt-hk-priv-d').innerText = t.hk_priv_d || "";
+            document.getElementById('txt-hk-sec-t').innerText = t.hk_sec_t || "Security & Version";
+            document.getElementById('txt-hk-open-t').innerText = t.hk_open_t || "Open Source";
+            document.getElementById('txt-hk-links-t').innerText = t.hk_links_t || "Important Links";
+            document.getElementById('txt-hk-dev').innerText = t.hk_dev || "Developer";
+            document.getElementById('txt-hk-proj').innerText = t.hk_proj || "Project";
+
+            // Inject new links and apply whitelist check
+            setTimeout(() => {
+                const whitelist = [
+                    'gameclients.tayfuntoprakcioglu.com/version.html',
+                    'tayfuntoprakcioglu.com', // Developer Website
+                    'gameclients.tayfuntoprakcioglu.com', // Project Official
+                    'amelabs.net', 'docs.amelabs.net', // Ameliorated
+                    'atlasos.net', 'docs.atlasos.net' // Atlas
+                ];
+                const shouldIframe = (u) => whitelist.some(d => u.includes(d));
+
+                const linksTitle = document.getElementById('txt-hk-links-t');
+                if (linksTitle && linksTitle.nextElementSibling) {
+                    const grid = linksTitle.nextElementSibling;
+                    if (!grid.innerHTML.includes('amelabs.net')) {
+                        grid.innerHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                                <!-- Ameliorated -->
+                                <div><strong style="display:block;color:var(--accent-color);margin-bottom:0.4rem;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;">Ameliorated.io</strong>
+                                <div style="display:flex;flex-direction:column;gap:2px;font-size:0.85rem;">
+                                    <a href="https://amelabs.net/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Website</a>
+                                    <a href="https://docs.amelabs.net/index.html" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Docs</a>
+                                    <a href="https://t.me/+TFCUAzfq6Y-Bl9vG" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Telegram</a>
+                                    <a href="https://discord.gg/kAnuJUPvGX" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Discord</a>
+                                    <a href="https://x.com/ameliorated117" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">X (Twitter)</a>
+                                </div></div>
+                                <!-- Atlas OS -->
+                                <div><strong style="display:block;color:var(--accent-color);margin-bottom:0.4rem;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;">Atlas OS</strong>
+                                <div style="display:flex;flex-direction:column;gap:2px;font-size:0.85rem;">
+                                    <a href="https://atlasos.net/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Website</a>
+                                    <a href="https://docs.atlasos.net/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Docs</a>
+                                    <a href="https://github.com/Atlas-OS/Atlas" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">GitHub</a>
+                                    <a href="https://discord.com/invite/atlasos" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Discord</a>
+                                    <a href="https://x.com/atlasos" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">X (Twitter)</a>
+                                </div></div>
+                                <!-- Developer -->
+                                <div><strong style="display:block;color:var(--accent-color);margin-bottom:0.4rem;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;">${t.hk_dev || 'Developer'}</strong>
+                                <div style="display:flex;flex-direction:column;gap:2px;font-size:0.85rem;">
+                                    <a href="https://tayfuntoprakcioglu.com/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Website</a>
+                                    <a href="https://www.linkedin.com/in/tayfuntoprakcioglu/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">LinkedIn</a>
+                                    <a href="https://www.instagram.com/tayfuntoprakcioglu" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Instagram</a>
+                                    <a href="https://github.com/tayfuntoprakcioglu" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">GitHub</a>
+                                </div></div>
+                                <!-- Project -->
+                                <div><strong style="display:block;color:var(--accent-color);margin-bottom:0.4rem;font-size:0.9rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;">${t.hk_proj || 'Project'}</strong>
+                                <div style="display:flex;flex-direction:column;gap:2px;font-size:0.85rem;">
+                                    <a href="https://gameclients.tayfuntoprakcioglu.com/" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Official Page</a>
+                                    <a href="https://github.com/tayfuntoprakcioglu/gameclients" target="_blank" style="color:#94a3b8;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Repo</a>
+                                </div></div>
+                            </div>`;
+                    }
+                }
+
+                document.querySelectorAll('#credits-modal a').forEach(link => {
+                    const url = link.href;
+                    if (url && (url.startsWith('http'))) {
+                        if (shouldIframe(url)) {
+                            link.removeAttribute('target');
+                            link.onclick = (e) => { e.preventDefault(); openIframeModal(url, link.innerText.trim()); };
+                        } else {
+                            link.onclick = null; link.target = "_blank";
+                        }
+                    }
+                });
+            }, 0);
+
+            updateTime();
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            let key = 'g_e'; if (hour >= 6 && hour < 12) key = 'g_m'; else if (hour >= 12 && hour < 18) key = 'g_a';
+            document.getElementById('txt-greet').innerText = translations[currentLang][key];
+            let loc = 'en-US'; const m = { tr: 'tr-TR', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', pt: 'pt-PT', ru: 'ru-RU', zh: 'zh-CN' };
+            if (m[currentLang]) loc = m[currentLang];
+            document.getElementById('clock').innerText = now.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('date').innerText = now.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' });
+        }
+        setInterval(updateTime, 1000);
+
+        function attemptFullscreen() {
+            // Prevent fullscreen if in iframe (Live Demo)
+            if (window.self !== window.top) return;
+            try { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => { }); } catch (e) { }
+        }
+
+        // --- BACKGROUND LOGIC ---
+        function selectTheme(theme) {
+            currentTheme = theme;
+            document.body.className = theme;
+            localStorage.setItem('gc_theme', theme);
+
+            const footerSelect = document.getElementById('theme-select');
+            if (footerSelect) footerSelect.value = theme;
+
+            applyBackground();
+            updateThemeUI();
+        }
+
+        function updateThemeUI() {
+            document.querySelectorAll('.theme-box').forEach(el => el.style.border = '2px solid rgba(255,255,255,0.1)');
+            const selected = document.querySelector(`.theme-option[data-theme="${currentTheme}"] .theme-box`);
+            if (selected) selected.style.border = '2px solid var(--accent-color)';
+        }
+
+        const presetBackgrounds = [
+            '1MZ8uoYNorSF.jpg', 'Gldq8Fz4kN5m.png', 'OkFcsckgq1Ay.jpg', 'SSLHI8Efls0B.jpg',
+            'ZtXjQZHPot03.jpeg', 'ZttvYUsePG20.png', 'aV0o3rgMJQeu.jpg', 'clHjOjCZb5hk.jpg',
+            'jylZVNXaffK5.jpg', 'klXbu004dJ0L.jpg', 'mJBt9nItXRjZ.jpg', 'w6UXaaqb9OrX.png',
+            'xMzyzLTGlTJS.jpg', 'yilng5dtNsnq.jpg', 'riDRijG15O2W.jpg'
+        ];
+
+        function openBgModal() {
+            renderPresets();
+            updateThemeUI();
+            document.getElementById('bg-modal').style.display = 'flex';
+        }
+
+        function renderPresets() {
+            const grid = document.getElementById('presets-grid');
+            if (!grid || grid.getAttribute('data-loaded')) return;
+
+            // 1. Render Presets
+            presetBackgrounds.forEach(img => {
+                const url = `../_i/${img}`;
+                const div = document.createElement('div');
+                div.style.cssText = "height: 100px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; background: #000;";
+
+                div.onmouseover = () => { div.style.borderColor = 'var(--accent-color)'; div.querySelector('img').style.transform = 'scale(1.1)'; };
+                div.onmouseout = () => { div.style.borderColor = 'transparent'; div.querySelector('img').style.transform = 'scale(1)'; };
+
+                div.onclick = () => {
+                    customBgUrl = url;
+                    localStorage.setItem('gc_bg', customBgUrl);
+                    applyBackground();
+                    closeBgModal();
+                };
+
+                const image = document.createElement('img');
+                image.src = url;
+                image.loading = "lazy";
+                image.style.cssText = "width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;";
+
+                div.appendChild(image);
+                grid.appendChild(div);
+            });
+
+            // Add Upload Card
+            const upCard = document.createElement('div');
+            upCard.style.cssText = "height: 100px; border-radius: 6px; border: 2px dashed rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.05);";
+            // Use HTML Entity
+            upCard.innerHTML = '<span style="font-size: 1.5rem; color: #cbd5e1; margin-bottom: 5px;">&#128194;</span><div style="display:flex; flex-direction:column; align-items:center;"><span style="font-size: 0.8rem; color: #94a3b8;">Upload Image</span><span style="font-size: 0.65rem; color: #64748b;">(JPG, PNG)</span></div>';
+            upCard.onmouseover = () => { upCard.style.borderColor = 'var(--accent-color)'; upCard.style.background = 'rgba(255,255,255,0.1)'; };
+            upCard.onmouseout = () => { upCard.style.borderColor = 'rgba(255,255,255,0.2)'; upCard.style.background = 'rgba(255,255,255,0.05)'; };
+            upCard.onclick = () => document.getElementById('bg-upload').click();
+            grid.appendChild(upCard);
+
+            grid.setAttribute('data-loaded', 'true');
+        }
+
+        function closeBgModal() {
+            document.getElementById('bg-modal').style.display = 'none';
+        }
+
+        function handleBgUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate Format (JPG/PNG)
+            if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+                showBgError("Only JPG and PNG formats are allowed.");
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize logic (HD Max)
+                    if (width > 1920 || height > 1080) {
+                        const ratio = Math.min(1920 / width, 1080 / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+                    customBgUrl = dataUrl;
+                    localStorage.setItem('gc_bg', customBgUrl);
+                    applyBackground();
+                    closeBgModal();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeBg() {
+            localStorage.removeItem('gc_bg');
+            customBgUrl = null;
+            applyBackground();
+            closeBgModal();
+        }
+
+        function hideBgError() {
+            const bgError = document.getElementById('bg-error-msg');
+            if (bgError) bgError.style.display = 'none';
+        }
+
+        // --- CREDITS MODAL LOGIC ---
+        function openCreditsModal() {
+            const modal = document.getElementById('credits-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeCreditsModal() {
+            document.getElementById('credits-modal').style.display = 'none';
+        }
+
+        // --- IFRAME MODAL LOGIC ---
+        function openIframeModal(url, title) {
+            const modal = document.getElementById('iframe-modal');
+            const iframe = document.getElementById('content-iframe');
+            const fallback = document.getElementById('iframe-fallback-link');
+            const titleEl = document.getElementById('iframe-title');
+
+            modal.style.zIndex = '9999'; // Ensure top
+
+            // Animation reset
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.95)';
+            modal.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+            iframe.src = url;
+            titleEl.innerText = title || url;
+            fallback.href = url;
+
+            modal.style.display = 'flex';
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            });
+        }
+
+        function closeIframeModal() {
+            const modal = document.getElementById('iframe-modal');
+            const iframe = document.getElementById('content-iframe');
+
+            modal.style.display = 'none';
+            iframe.src = ''; topt
+        }
+
+        // Nav
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('name-modal').style.display === 'flex') { if (e.key === 'Escape') closeNameModal(); return; }
+            if (document.getElementById('bg-modal').style.display === 'flex') { if (e.key === 'Escape') closeBgModal(); return; }
+            if (document.getElementById('iframe-modal').style.display === 'flex') { if (e.key === 'Escape') closeIframeModal(); return; }
+            if (document.getElementById('credits-modal').style.display === 'flex') { if (e.key === 'Escape') closeCreditsModal(); return; }
+
+            const items = Array.from(document.querySelectorAll('.tv-card, select, button'));
+            if (items.length === 0) return;
+            const active = document.activeElement;
+            const index = items.indexOf(active);
+            if (index === -1) { items[0].focus(); return; }
+            if (e.key === 'ArrowRight') { (items[index + 1] || items[0]).focus(); }
+            else if (e.key === 'ArrowLeft') { (items[index - 1] || items[items.length - 1]).focus(); }
+        });
+    </script>
+    <!-- DOWNLOAD MODAL -->
+    <div id="dl-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 500px; width: 90%; color: #fff; text-align: left;">
+            <h3 id="dl-title" style="margin-bottom: 5px; color: var(--accent-color);">Download</h3>
+            <p id="dl-desc" style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 20px;">
+                Downloading official installer from:
+            </p>
+
+            <div
+                style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; word-break: break-all; overflow-wrap: break-word; font-family: monospace; font-size: 0.85rem; color: #60a5fa;">
+                <span id="dl-url-text">...</span>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-save" onclick="confirmDownload()" id="btn-dl-confirm">Download</button>
+                <div style="flex:1"></div>
+                <button class="btn btn-cancel" onclick="closeDlModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOWNLOAD LOGIC ---
+        let currentDlUrl = '';
+
+        function openDownloadModal(item) {
+            const dlModal = document.getElementById('dl-modal');
+            const titleEl = document.getElementById('dl-title');
+            const urlEl = document.getElementById('dl-url-text');
+
+            // STRICT: Use window.DOWNLOAD_LINKS
+            const dlMap = window.DOWNLOAD_LINKS || {};
+            let url = dlMap[item.id];
+
+            const confirmBtn = document.getElementById('btn-dl-confirm');
+
+            if (!url) {
+                url = "LINK NOT FOUND IN JS";
+                if (confirmBtn) confirmBtn.style.display = 'none';
+            } else {
+                currentDlUrl = url;
+                if (confirmBtn) confirmBtn.style.display = 'block';
+            }
+            titleEl.innerText = `Download ${item.name}`;
+            urlEl.innerText = url;
+
+            dlModal.style.display = 'flex';
+        }
+
+        function closeDlModal() {
+            document.getElementById('dl-modal').style.display = 'none';
+            currentDlUrl = '';
+        }
+
+        function confirmDownload() {
+            if (!currentDlUrl) return;
+
+            // Invisible download via Iframe
+            let iframe = document.getElementById('dl-iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'dl-iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+            iframe.src = currentDlUrl;
+
+            // Close modal after a short delay
+            setTimeout(() => {
+                closeDlModal();
+            }, 1000);
+        }
+    </script>
+
+</html>

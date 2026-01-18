@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+    /* Reset media queries from previous edits to ensure clean slate for the replacement above */
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Clients - The Ultimate Gaming Shell for Atlas OS</title>
+    <link rel="icon" type="image/svg+xml" href="_i/favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --accent-color: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.5);
+            --text-color: #e2e8f0;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Navbar - Fixed & Glassmorphism */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(30, 41, 59, 0.4);
+            /* Metallic/Slate transparent */
+            backdrop-filter: blur(20px);
+            /* Strong glass effect */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Common Nav Button Styles */
+        .btn-nav-base {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        /* Live Demo Button - Explicit Fix */
+        .btn-nav-livedemo {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-nav-livedemo:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        /* Primary Action Button */
+        .btn-nav-primary {
+            background: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-nav-primary:hover {
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
+            background: #6d28d9;
+        }
+
+        /* Language Switcher in Nav */
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .lang-btn option {
+            background: #000;
+        }
+
+        .lang-btn:hover {
+            border-color: #fff;
+        }
+
+        .hamburger {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: 15px 20px;
+                background: rgba(11, 14, 20, 0.95);
+            }
+
+            .hamburger {
+                display: block;
+                font-size: 1.5rem;
+                color: #fff;
+                cursor: pointer;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                height: 0;
+                overflow: hidden;
+                background: rgba(11, 14, 20, 0.98);
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0;
+                transition: height 0.3s ease-in-out, padding 0.3s;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(15px);
+            }
+
+            .nav-links.active {
+                height: auto;
+                padding: 30px 0;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-link {
+                display: block;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .about-col {
+                text-align: left;
+            }
+
+            .hamburger {
+                display: none !important;
+            }
+
+            .mobile-lang {
+                display: block !important;
+                margin-left: auto;
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 5px 10px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem !important;
+            }
+
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .btn-nav-base {
+                width: 80%;
+                justify-content: center;
+                padding: 12px;
+            }
+
+            .step-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .step-num {
+                margin: 0 auto;
+                width: auto;
+            }
+
+            footer {
+                padding: 30px 20px;
+            }
+
+            .actions {
+                display: none !important;
+            }
+
+            .mobile-warning {
+                display: block !important;
+            }
+        }
+
+        /* Hero */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            padding-top: 80px;
+            /* Offset for fixed nav */
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(to bottom, transparent, var(--bg-color));
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Hero Background Slideshow */
+        #hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1s ease-in-out;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        #hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(30, 58, 138, 0.3) 0%, rgba(2, 6, 23, 0.95) 100%);
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            animation: float 10s infinite linear;
+            opacity: 0.3;
+            z-index: 2;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .hero-content {
+            z-index: 10;
+            animation: zoomIn 1s ease-out;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .badge-beta {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .atlas-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: #6ee7b7;
+            margin-bottom: 30px;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .atlas-badge:hover {
+            background: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Features */
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            scroll-margin-top: 80px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: var(--glass-border);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            cursor: zoom-in;
+            height: auto;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-color);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* FAQ Section */
+        .faq-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .faq-subtitle {
+            color: #3b82f6;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .faq-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .faq-item {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            width: 100%;
+            background: none;
+            border: none;
+            color: #fff;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .faq-answer p {
+            padding: 0 25px 25px 25px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Atlas OS & About Section */
+        .atlas-section {
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.1), transparent);
+            border-left: 5px solid #10b981;
+            padding: 40px;
+            margin: 60px 0;
+            border-radius: 0 20px 20px 0;
+        }
+
+        .atlas-link {
+            color: #34d399;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .atlas-link:hover {
+            text-decoration: underline;
+        }
+
+        /* About Grid */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .about-col h4 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .about-col a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: color 0.2s;
+        }
+
+        .about-col a:hover {
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 5px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Demo Iframe */
+        .iframe-container {
+            width: 95vw;
+            height: 90vh;
+            background: #000;
+            border-radius: 10px;
+            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .iframe-header {
+            height: 40px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            flex: 1;
+        }
+
+        /* Installation Steps */
+        .install-box {
+            background: #1e293b;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .step-num {
+            font-size: 2rem;
+            color: var(--accent-color);
+            font-weight: 800;
+            width: 60px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+
+            .navbar {
+                padding: 15px;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            /* Hide links on mobile, keep logo/DL */
+            .btn-nav-base {
+                font-size: 0.75rem;
+                padding: 8px 15px;
+            }
+
+            .step-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .step-num {
+                margin: 0 auto;
+                width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-gamepad" style="color:var(--accent-color); font-size: 1.8rem;"></i>
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <a href="#" class="nav-logo" style="margin:0; line-height: 1; font-size: 1.2rem;">GAME CLIENTS</a>
+                <a href="https://tayfuntoprakcioglu.com" target="_blank"
+                    style="font-size: 0.6rem; color: #94a3b8; text-decoration: none; margin-top: 2px; font-weight: 600; letter-spacing: 0.5px; transition: color 0.2s;"
+                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
+                    Created by TAYFUN TOPRAKCIOGLU
+                </a>
+            </div>
+        </div>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <select class="lang-btn mobile-lang" id="langSelectMobile" onchange="changeLanguage(this.value)"
+            style="display:none;">
+            <option value="en">🇺🇸 English</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="ko">🇰🇷 한국어</option>
+            <option value="pl">🇵🇱 Polski</option>
+            <option value="nl">🇳🇱 Nederlands</option>
+            <option value="ar">🇸🇦 العربية</option>
+            <option value="id">🇮🇩 Indonesia</option>
+        </select>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#features" class="nav-link" data-i18n="nav_feat">Features & Details</a>
+            <a href="#gallery" class="nav-link" data-i18n="nav_gall">Gallery</a>
+            <a href="#faq" class="nav-link" data-i18n="nav_faq">FAQ</a>
+            <a href="#install" class="nav-link" data-i18n="nav_inst">Installation Guide</a>
+            <a href="#about" class="nav-link" data-i18n="nav_about">About & Integration</a>
+
+            <button onclick="openDemo()" class="btn-nav-base btn-nav-livedemo">
+                <i class="fa-solid fa-play" style="font-size:0.8rem"></i> <span data-i18n="nav_demo">Live Demo</span>
+            </button>
+
+            <select class="lang-btn" id="langSelect" onchange="changeLanguage(this.value)">
+                <option value="en">🇺🇸 English</option>
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="it">🇮🇹 Italiano</option>
+                <option value="pt">🇵🇹 Português</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="pl">🇵🇱 Polski</option>
+                <option value="nl">🇳🇱 Nederlands</option>
+                <option value="ar">🇸🇦 العربية</option>
+                <option value="id">🇮🇩 Indonesia</option>
+            </select>
+
+            <a href="_v/GameClients_Beta.zip" class="btn-nav-base btn-nav-primary">
+                <i class="fa-solid fa-download"></i> <span data-i18n="nav_dl">Download Beta</span>
+            </a>
+        </div>
+    </nav>
+
+    <div id="particles"></div>
+
+    <header>
+        <div id="hero-bg"></div>
+        <div id="hero-overlay"></div>
+
+        <div class="hero-content">
+            <div class="badge-beta" data-i18n="hero_badge">Beta v2.6 - Developer Preview</div>
+            <h1>GAME CLIENTS</h1>
+            <p class="subtitle" data-i18n="hero_sub">The Ultimate Gaming Shell Re-imagined.</p>
+
+            <a href="https://atlasos.net/" target="_blank" class="atlas-badge">
+                <i class="fa-solid fa-check-circle"></i> <span data-i18n="hero_atlas">Fully Integrated with
+                    <strong>Atlas OS</strong></span>
+            </a>
+
+            <div class="actions">
+                <a href="_v/GameClients_Beta.zip" class="btn btn-primary">
+                    <i class="fa-solid fa-download"></i> <span data-i18n="hero_dl">Download Beta</span>
+                </a>
+                <button onclick="openDemo()" class="btn btn-secondary">
+                    <i class="fa-solid fa-laptop"></i> <span data-i18n="hero_demo">View demo (Live)</span>
+                </button>
+            </div>
+            <p class="mobile-warning"
+                style="display:none; color: #fca5a5; font-size: 0.95rem; margin-top: 20px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);"
+                data-i18n="mobile_dl_msg">To download Game Clients, please view on a desktop device.</p>
+
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.6;" data-i18n="hero_warn">* Warning: This is
+                experimental software under active development.</p>
+        </div>
+    </header>
+
+    <section id="features" class="section">
+        <h2 style="text-align:center; font-size: 2.5rem; margin-bottom:50px;" data-i18n="sect_feat">Features & Details
+        </h2>
+        <div class="grid">
+            <div class="card">
+                <i class="fa-solid fa-rocket"></i>
+                <h3>Game Mode Booster</h3>
+                <p>Aggressive optimization: Kills Explorer.exe, disables Search/Telemetry/SysMain. Frees up max RAM/CPU.
+                </p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-desktop"></i>
+                <h3>Shell Replacement</h3>
+                <p>Replaces Windows Desktop. Boot directly into your game library. No bloat, just games.</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-wifi"></i>
+                <h3>System Control</h3>
+                <p>Manage Wifi and Bluetooth directly from the dashboard without needing Explorer.</p>
+            </div>
+            <div class="card">
+                <i class="fa-brands fa-steam"></i>
+                <h3>Unified Library</h3>
+                <p>Auto-detects Steam, Epic, Ubisoft, Riot, EA, Battle.net, and Xbox games.</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-broom"></i>
+                <h3>Auto-Clean</h3>
+                <p>Auto-cleans %TEMP% and flushes DNS cache for stability.</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-palette"></i>
+                <h3>Customizable</h3>
+                <p>HTML/CSS based. Fully hackable themes and layouts.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="section">
+        <h2 style="text-align:center; font-size: 2.5rem; margin-bottom:50px;" data-i18n="sect_gall">Gallery</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openLightbox(this)"><img src="_s/1.png" alt="Dashboard"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"><img src="_s/2.jpg" alt="Library"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"><img src="_s/3.png" alt="Settings"></div>
+            <div class="gallery-item" onclick="openLightbox(this)"><img src="_s/4.png" alt="Setup"></div>
+        </div>
+    </section>
+
+    <section id="faq" class="section">
+        <div class="faq-header">
+            <span class="faq-subtitle">FAQ</span>
+            <div class="faq-title" data-i18n="sect_faq">Frequently asked questions</div>
+        </div>
+        <div class="faq-container">
+            <!-- Project Specific FAQs -->
+            <div class="faq-item">
+                <button class="faq-question">What is Game Clients?</button>
+                <div class="faq-answer">
+                    <p>Game Clients is a custom shell replacement for Windows 10 & 11, specifically optimized for
+                        modified OS versions like AtlasOS. It replaces the standard Windows Desktop (Explorer) with a
+                        lightweight, controller-friendly gaming interface.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Does it work on stock Windows?</button>
+                <div class="faq-answer">
+                    <p>Yes! While it is designed for AtlasOS, it works on any Windows 10/11 installation. However, for
+                        the best performance and "console-like" experience, we recommend using it with a stripped-down
+                        OS like Atlas.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Is it safe/open source?</button>
+                <div class="faq-answer">
+                    <p>Absolutely. Game Clients is 100% open source. You can inspect the code on GitHub. All data is
+                        stored locally on your machine.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How do I access my other apps?</button>
+                <div class="faq-answer">
+                    <p>The interface has an "Apps" section where you can add shortcuts to non-game applications
+                        (Browser, Discord, Spotify, etc.). You can also launch Task Manager at any time.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How do I uninstall?</button>
+                <div class="faq-answer">
+                    <p>Run the <code>GameClients_Return.cmd</code> script included in the folder. This will look for the
+                        original Windows Shell registry key and restore Explorer.exe as your default desktop.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="install" class="section">
+        <h2 style="text-align:center; font-size: 2.5rem; margin-bottom:50px;" data-i18n="sect_inst">Installation Guide
+        </h2>
+        <div class="install-box">
+            <div class="step-row">
+                <div class="step-num">01</div>
+                <div>
+                    <h3>Download & Extract</h3>
+                    <p>Get <code>GameClients_Beta.zip</code> and extract to <code>C:\Games\GameClients</code>.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">02</div>
+                <div>
+                    <h3>Run Setup</h3>
+                    <p>Run <code>GameClients_START.cmd</code> as <strong>Administrator</strong>.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">03</div>
+                <div>
+                    <h3>Install</h3>
+                    <p>Select option <code>1</code> to configure the Shell.</p>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">04</div>
+                <div>
+                    <h3>Reboot</h3>
+                    <p>Restart PC. Welcome to your new Gaming Shell.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <h2 style="text-align:center; font-size: 2.5rem;" data-i18n="sect_about">About & Integration</h2>
+        <div class="atlas-section">
+            <h2><i class="fa-brands fa-windows"></i> Optimized for Atlas OS</h2>
+            <p style="margin-top:10px; color:#cbd5e1;">
+                Atlas OS is an open-source modification of Windows that removes all bloatware and privacy invasions.
+                <strong>Game Clients</strong> is designed to run perfectly on top of Atlas OS, providing the cleanest,
+                fastest gaming experience possible.
+            </p>
+        </div>
+
+        <div class="about-grid">
+            <div class="about-col">
+                <h4>Ameliorated.io</h4>
+                <a href="https://t.me/+TFCUAzfq6Y-Bl9vG" target="_blank">Telegram</a>
+                <a href="https://discord.gg/kAnuJUPvGX" target="_blank">Discord</a>
+                <a href="https://x.com/ameliorated117" target="_blank">X (Twitter)</a>
+                <a href="https://docs.amelabs.net/index.html" target="_blank">Docs</a>
+            </div>
+            <div class="about-col">
+                <h4>Atlas OS</h4>
+                <a href="https://github.com/Atlas-OS/Atlas" target="_blank">GitHub</a>
+                <a href="https://discord.com/invite/atlasos" target="_blank">Discord</a>
+                <a href="https://x.com/atlasos" target="_blank">X (Twitter)</a>
+            </div>
+            <div class="about-col">
+                <h4>Developer</h4>
+                <a href="https://tayfuntoprakcioglu.com/" target="_blank">Website</a>
+                <a href="https://www.linkedin.com/in/tayfuntoprakcioglu/" target="_blank">LinkedIn</a>
+                <a href="https://www.instagram.com/tayfuntoprakcioglu" target="_blank">Instagram</a>
+                <a href="https://github.com/tayfuntoprakcioglu" target="_blank">GitHub</a>
+            </div>
+            <div class="about-col">
+                <h4>Project</h4>
+                <a href="https://gameclients.tayfuntoprakcioglu.com/" target="_blank">Official Page</a>
+                <a href="https://github.com/tayfuntoprakcioglu/gameclients" target="_blank">Repo</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Game Clients Project. Developed for Atlas OS & Windows 10/11 Optimization.</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="modal" onclick="closeLightbox()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="lightbox-img">
+    </div>
+
+    <!-- Demo Modal -->
+    <div id="demoModal" class="modal">
+        <div class="iframe-container">
+            <div class="iframe-header">
+                <span style="font-size:0.9rem; color:#fff; font-weight:600;">Game Clients Preview - Live Demo</span>
+                <div style="flex:1"></div>
+                <button onclick="closeDemo()"
+                    style="background:none; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer;"
+                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+            </div>
+            <iframe src="_demo/demogui.html"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Particles
+        const particles = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            p.style.animationDelay = (Math.random() * 5) + 's';
+            particles.appendChild(p);
+        }
+
+        // Hero Background Slideshow
+        const bgImages = [
+            '1MZ8uoYNorSF.jpg', 'Gldq8Fz4kN5m.png', 'OkFcsckgq1Ay.jpg',
+            'SSLHI8Efls0B.jpg', 'ZtXjQZHPot03.jpeg', 'ZttvYUsePG20.png',
+            'aV0o3rgMJQeu.jpg', 'clHjOjCZb5hk.jpg', 'jylZVNXaffK5.jpg',
+            'klXbu004dJ0L.jpg', 'mJBt9nItXRjZ.jpg', 'riDRijG15O2W.jpg',
+            'w6UXaaqb9OrX.png', 'xMzyzLTGlTJS.jpg', 'yilng5dtNsnq.jpg'
+        ];
+
+        let currentBgIndex = 0;
+        const heroBg = document.getElementById('hero-bg');
+
+        function changeBg() {
+            // Preload next image? Browser might handle it.
+            // Fade out
+            heroBg.style.opacity = '0';
+
+            setTimeout(() => {
+                currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+                heroBg.style.backgroundImage = `url('_i/${bgImages[currentBgIndex]}')`;
+                heroBg.style.opacity = '0.6'; // Fade back in (0.6 opacity to blend with black bg)
+            }, 1000);
+        }
+
+        // Set initial bg
+        heroBg.style.backgroundImage = `url('_i/${bgImages[0]}')`;
+        setInterval(changeBg, 6000); // Change every 6 seconds
+
+        // Modal Logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const demoModal = document.getElementById('demoModal');
+
+        function openLightbox(element) {
+            const src = element.querySelector('img').src;
+            lightboxImg.src = src;
+            lightbox.style.display = 'flex';
+        }
+        function closeLightbox() { lightbox.style.display = 'none'; }
+
+        function openDemo() { demoModal.style.display = 'flex'; }
+        function closeDemo() { demoModal.style.display = 'none'; }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === "Escape") { closeLightbox(); closeDemo(); }
+        });
+
+        // FAQ Toggle
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const answer = item.querySelector('.faq-answer');
+
+                // Toggle current
+                item.classList.toggle('active');
+
+                if (item.classList.contains('active')) {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                } else {
+                    answer.style.maxHeight = '0';
+                }
+            });
+        });
+
+        // --- TRANSLATION LOGIC (15 Languages) ---
+        const translations = {
+            en: {
+                nav_feat: "Features & Details",
+                nav_gall: "Gallery",
+                nav_faq: "FAQ",
+                nav_inst: "Installation Guide",
+                nav_about: "About & Integration",
+                nav_demo: "Live Demo",
+                nav_dl: "Download Beta",
+                hero_badge: "Beta v2.6 - Developer Preview",
+                hero_sub: "The Ultimate Gaming Shell Re-imagined.",
+                hero_atlas: "Fully Integrated with <strong>Atlas OS</strong>",
+                hero_dl: "Download Beta",
+                hero_demo: "View demo (Live)",
+                hero_warn: "* Warning: This is experimental software under active development.",
+                sect_feat: "Features & Details",
+                sect_gall: "Gallery",
+                sect_faq: "Frequently asked questions",
+                sect_inst: "Installation Guide",
+                sect_about: "About & Integration",
+                mobile_dl_msg: "To download Game Clients, please view on a desktop device."
+            },
+            tr: {
+                nav_feat: "Özellikler & Detaylar",
+                nav_gall: "Galeri",
+                nav_faq: "SSS",
+                nav_inst: "Kurulum Rehberi",
+                nav_about: "Hakkında & Entegrasyon",
+                nav_demo: "Canlı Demo",
+                nav_dl: "Beta İndir",
+                hero_badge: "Beta v2.6 - Geliştirici Önizlemesi",
+                hero_sub: "Nihai Oyun Kabuğu Yeniden Tasarlandı.",
+                hero_atlas: "<strong>Atlas OS</strong> ile Tam Entegre",
+                hero_dl: "Beta İndir",
+                hero_demo: "Demoyu Görüntüle",
+                hero_warn: "* Uyarı: Bu, geliştirilmekte olan deneysel bir yazılımdır.",
+                sect_feat: "Özellikler & Detaylar",
+                sect_gall: "Galeri",
+                sect_faq: "Sıkça Sorulan Sorular",
+                sect_inst: "Kurulum Rehberi",
+                sect_about: "Hakkında & Entegrasyon",
+                mobile_dl_msg: "Game Clients indirmek için lütfen masaüstü cihazınızdan görüntüleyiniz."
+            },
+            de: {
+                nav_feat: "Funktionen & Details", nav_gall: "Galerie", nav_faq: "FAQ", nav_inst: "Installationsanleitung", nav_about: "Über & Integration", nav_demo: "Live-Demo", nav_dl: "Beta herunterladen",
+                hero_badge: "Beta v2.6 - Entwicklervorschau", hero_sub: "Die ultimative Gaming-Shell neu gedacht.", hero_atlas: "Vollständig in <strong>Atlas OS</strong> integriert",
+                hero_dl: "Beta herunterladen", hero_demo: "Demo ansehen", hero_warn: "* Warnung: Dies ist experimentelle Software.",
+                sect_feat: "Funktionen & Details", sect_gall: "Galerie", sect_faq: "Häufig gestellte Fragen", sect_inst: "Installationsanleitung", sect_about: "Über & Integration"
+            },
+            fr: {
+                nav_feat: "Fonctionnalités", nav_gall: "Galerie", nav_faq: "FAQ", nav_inst: "Guide d'installation", nav_about: "À propos", nav_demo: "Démo Live", nav_dl: "Télécharger Beta",
+                hero_badge: "Beta v2.6 - Aperçu développeur", hero_sub: "Le shell de jeu ultime réimaginé.", hero_atlas: "Entièrement intégré à <strong>Atlas OS</strong>",
+                hero_dl: "Télécharger Beta", hero_demo: "Voir la démo", hero_warn: "* Attention: Logiciel expérimental.",
+                sect_feat: "Fonctionnalités", sect_gall: "Galerie", sect_faq: "Questions fréquentes", sect_inst: "Guide d'installation", sect_about: "À propos"
+            },
+            es: {
+                nav_feat: "Características", nav_gall: "Galería", nav_faq: "FAQ", nav_inst: "Guía de instalación", nav_about: "Acerca de", nav_demo: "Demo en vivo", nav_dl: "Descargar Beta",
+                hero_badge: "Beta v2.6 - Vista previa", hero_sub: "El shell de juego definitivo.", hero_atlas: "Totalmente integrado con <strong>Atlas OS</strong>",
+                hero_dl: "Descargar Beta", hero_demo: "Ver demostración", hero_warn: "* Advertencia: Software experimental.",
+                sect_feat: "Características", sect_gall: "Galería", sect_faq: "Preguntas frecuentes", sect_inst: "Guía de instalación", sect_about: "Acerca de"
+            },
+            it: {
+                nav_feat: "Funzionalità", nav_gall: "Galleria", nav_faq: "FAQ", nav_inst: "Guida all'installazione", nav_about: "Informazioni", nav_demo: "Demo Live", nav_dl: "Scarica Beta",
+                hero_badge: "Beta v2.6 - Anteprima sviluppatore", hero_sub: "La shell di gioco definitiva.", hero_atlas: "Completamente integrato con <strong>Atlas OS</strong>",
+                hero_dl: "Scarica Beta", hero_demo: "Vedi demo", hero_warn: "* Attenzione: Software sperimentale.",
+                sect_feat: "Funzionalità", sect_gall: "Galleria", sect_faq: "Domande frequenti", sect_inst: "Guida all'installazione", sect_about: "Informazioni"
+            },
+            pt: {
+                nav_feat: "Recursos", nav_gall: "Galeria", nav_faq: "FAQ", nav_inst: "Guia de Instalação", nav_about: "Sobre", nav_demo: "Demo ao Vivo", nav_dl: "Baixar Beta",
+                hero_badge: "Beta v2.6 - Prévia do Desenvolvedor", hero_sub: "O shell de jogo definitivo.", hero_atlas: "Totalmente integrado com <strong>Atlas OS</strong>",
+                hero_dl: "Baixar Beta", hero_demo: "Ver demonstração", hero_warn: "* Aviso: Software experimental.",
+                sect_feat: "Recursos", sect_gall: "Galeria", sect_faq: "Perguntas Frequentes", sect_inst: "Guia de Instalação", sect_about: "Sobre"
+            },
+            ru: {
+                nav_feat: "Функции", nav_gall: "Галерея", nav_faq: "FAQ", nav_inst: "Установка", nav_about: "О проекте", nav_demo: "Демо", nav_dl: "Скачать Бета",
+                hero_badge: "Бета v2.6 - Превью", hero_sub: "Идеальная игровая оболочка.", hero_atlas: "Полная интеграция с <strong>Atlas OS</strong>",
+                hero_dl: "Скачать Бета", hero_demo: "Смотреть демо", hero_warn: "* Внимание: Экспериментальное ПО.",
+                sect_feat: "Функции", sect_gall: "Галерея", sect_faq: "Частые вопросы", sect_inst: "Установка", sect_about: "О проекте"
+            },
+            zh: {
+                nav_feat: "功能与详情", nav_gall: "画廊", nav_faq: "常见问题", nav_inst: "安装指南", nav_about: "关于", nav_demo: "现场演示", nav_dl: "下载测试版",
+                hero_badge: "Beta v2.6 - 开发者预览", hero_sub: "终极游戏外壳重塑。", hero_atlas: "与 <strong>Atlas OS</strong> 完全集成",
+                hero_dl: "下载测试版", hero_demo: "查看演示", hero_warn: "* 警告：这是实验性软件。",
+                sect_feat: "功能与详情", sect_gall: "画廊", sect_faq: "常见问题", sect_inst: "安装指南", sect_about: "关于"
+            },
+            ja: {
+                nav_feat: "機能と詳細", nav_gall: "ギャラリー", nav_faq: "FAQ", nav_inst: "インストールガイド", nav_about: "概要", nav_demo: "ライブデモ", nav_dl: "ベータ版をDL",
+                hero_badge: "Beta v2.6 - 開発者プレビュー", hero_sub: "究極のゲームシェル。", hero_atlas: "<strong>Atlas OS</strong> と完全統合",
+                hero_dl: "ベータ版をDL", hero_demo: "デモを見る", hero_warn: "* 警告：実験的なソフトウェアです。",
+                sect_feat: "機能と詳細", sect_gall: "ギャラリー", sect_faq: "よくある質問", sect_inst: "インストールガイド", sect_about: "概要"
+            },
+            ko: {
+                nav_feat: "기능 및 세부정보", nav_gall: "갤러리", nav_faq: "FAQ", nav_inst: "설치 가이드", nav_about: "정보", nav_demo: "라이브 데모", nav_dl: "베타 다운로드",
+                hero_badge: "Beta v2.6 - 개발자 미리보기", hero_sub: "궁극의 게이밍 쉘.", hero_atlas: "<strong>Atlas OS</strong>와 완전 통합",
+                hero_dl: "베타 다운로드", hero_demo: "데모 보기", hero_warn: "* 경고: 실험적인 소프트웨어입니다.",
+                sect_feat: "기능 및 세부정보", sect_gall: "갤러리", sect_faq: "자주 묻는 질문", sect_inst: "설치 가이드", sect_about: "정보"
+            },
+            pl: {
+                nav_feat: "Funkcje", nav_gall: "Galeria", nav_faq: "FAQ", nav_inst: "Instalacja", nav_about: "O projekcie", nav_demo: "Demo Na Żywo", nav_dl: "Pobierz Beta",
+                hero_badge: "Beta v2.6 - Podgląd", hero_sub: "Ostateczna powłoka do gier.", hero_atlas: "Pełna integracja z <strong>Atlas OS</strong>",
+                hero_dl: "Pobierz Beta", hero_demo: "Zobacz demo", hero_warn: "* Uwaga: Oprogramowanie eksperymentalne.",
+                sect_feat: "Funkcje", sect_gall: "Galeria", sect_faq: "Częste pytania", sect_inst: "Instalacja", sect_about: "O projekcie"
+            },
+            nl: {
+                nav_feat: "Functies", nav_gall: "Galerij", nav_faq: "FAQ", nav_inst: "Installatie", nav_about: "Over", nav_demo: "Live Demo", nav_dl: "Beta Downloaden",
+                hero_badge: "Beta v2.6 - Preview", hero_sub: "De ultieme gaming shell.", hero_atlas: "Volledig geïntegreerd met <strong>Atlas OS</strong>",
+                hero_dl: "Beta Downloaden", hero_demo: "Bekijk demo", hero_warn: "* Waarschuwing: Experimentele software.",
+                sect_feat: "Functies", sect_gall: "Galerij", sect_faq: "Veelgestelde vragen", sect_inst: "Installatie", sect_about: "Over"
+            },
+            ar: {
+                nav_feat: "الميزات", nav_gall: "المعرض", nav_faq: "الأسئلة الشائعة", nav_inst: "دليل التثبيت", nav_about: "حول", nav_demo: "تجدربة حية", nav_dl: "تحميل النسخة التجريبية",
+                hero_badge: "نسخة تجريبية 2.6", hero_sub: "واجهة الألعاب النهائية.", hero_atlas: "متكامل تمامًا مع <strong>Atlas OS</strong>",
+                hero_dl: "تحميل", hero_demo: "مشاهدة العرض", hero_warn: "* تحذير: هذا برنامج تجريبي.",
+                sect_feat: "الميزات", sect_gall: "المعرض", sect_faq: "الأسئلة الشائعة", sect_inst: "دليل التثبيت", sect_about: "حول"
+            },
+            id: {
+                nav_feat: "Fitur", nav_gall: "Galeri", nav_faq: "FAQ", nav_inst: "Panduan Instalasi", nav_about: "Tentang", nav_demo: "Demo Langsung", nav_dl: "Unduh Beta",
+                hero_badge: "Beta v2.6 - Pratinjau", hero_sub: "Shell gaming terbaik.", hero_atlas: "Terintegrasi penuh dengan <strong>Atlas OS</strong>",
+                hero_dl: "Unduh Beta", hero_demo: "Lihat demo", hero_warn: "* Peringatan: Perangkat lunak eksperimental.",
+                sect_feat: "Fitur", sect_gall: "Galeri", sect_faq: "Pertanyaan Umum", sect_inst: "Panduan Instalasi", sect_about: "Tentang"
+            }
+        };
+
+        function changeLanguage(lang) {
+            const data = translations[lang] || translations['en'];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (data[key]) {
+                    el.innerHTML = data[key];
+                }
+            });
+            // Update Selects
+            document.querySelectorAll('.lang-btn').forEach(el => el.value = lang);
+            localStorage.setItem('gc_lang_landing', lang);
+
+            // RTL handling for Arabic
+            if (lang === 'ar') document.body.style.direction = 'rtl';
+            else document.body.style.direction = 'ltr';
+        }
+
+        // Load saved lang
+        const savedLang = localStorage.getItem('gc_lang_landing') || 'en';
+        changeLanguage(savedLang);
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>
