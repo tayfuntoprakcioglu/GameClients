@@ -4,10 +4,10 @@
 
 Game Clients is a custom shell replacement for Windows 10 & 11, specifically optimized for modified OS versions like **AtlasOS**. It replaces the standard Windows Desktop (Explorer) with a lightweight, controller-friendly gaming interface, designed to provide the cleanest, fastest gaming experience possible.
 
-![Game Clients Preview](_s/1.png)
-![Game Clients Preview](_s/2.jpg)
-![Game Clients Preview](_s/3.png)
-![Game Clients Preview](_s/4.png)
+![Game Clients Preview](https://tayfuntoprakcioglu.github.io/GameClients/s/1.png)
+![Game Clients Preview](https://tayfuntoprakcioglu.github.io/GameClients/s//2.jpg)
+![Game Clients Preview](https://tayfuntoprakcioglu.github.io/GameClients/s//3.png)
+![Game Clients Preview](https://tayfuntoprakcioglu.github.io/GameClients/s//4.png)
 
 ## Features
 
